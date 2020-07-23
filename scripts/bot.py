@@ -1,58 +1,58 @@
 #! /usr/bin/env python
 
 from echoslam.msg import Bot
+from robot import Robot
 import rospy
 import sys
 import getopt
 import json
 from random import random
 
-
-bot = Bot()
-bot.id.data = None
-bot.x.data = None
-bot.y.data = None
-
-bot_teamsize = None
-bot_name = "bot1"
-
-
-topic_name = "RF"
-
 def callback(msg):
-	#rospy.loginfo(msg.id.data, ': I heard', msg.x.data, msg.y.data)
-	print "I am " + str(msg.id.data)
-	print "I heard" + str(msg.x.data) + " " + str(msg.y.data) 
+	print('Incoming message...')
+	print('bot_id:', msg.id.data)
+	print('bot_pos: {x: .2f},{y: .2f}'.format(x=msg.x.data, y=msg.y.data))
 
-rospy.init_node(bot_name)
-sub = rospy.Subscriber(topic_name, Bot, callback)
-pub = rospy.Publisher(topic_name, Bot, queue_size=1)
+robot = Robot()
+sub = rospy.Subscriber(robot.topic_name, Bot, callback)
+pub = rospy.Publisher(robot.topic_name, Bot, queue_size=1)
 
-if len(sys.argv) <=1:
-	print('Please enter id and teamsize')
-	sys.exit(2)
+def main():
+	try:
+		robot.id, robot.teamsize = cl_args()
+	except ValueError as error:
+		print(error)
+		print('Exiting...')
+		sys.exit(2)
 
-try:
-	optlist, _ = getopt.getopt(sys.argv[1:], "i:n:", ['id=','teamsize=']) 
-except getopt.GetoptError:
-	print('Invalid args, exiting...')
-	sys.exit(2)
-for opt, arg in optlist:
-	if opt in ('-i', '--id'):
-		bot_id = int(arg)
-	elif opt in ('-n', '--teamsize'):
-		teamsize = int(arg)
+	robot.initRandomPos((0, 0), (10, 10))
+	robot.createMsg()
+	rospy.init_node('bot')
 
-if bot_id is None or teamsize is None:
-	print('Please enter both id and teamsize')
-	sys.exit(2)
+	
 
-bot.id.data = bot_id
-bot.x.data = random()*10
-bot.y.data= random()*10
 
-rate=rospy.Rate(2)
+def cl_args():
+	if len(sys.argv) <=1:
+		raise ValueError('Please enter id and teamsize.')
+		
+	try:
+		optlist, _ = getopt.getopt(sys.argv[1:], "i:n:", ['id=','teamsize=']) 
+	except getopt.GetoptError:
+		raise ValueError('Invalid arguments!')
 
-while not rospy.is_shutdown():
-	pub.publish(bot)
-	rate.sleep()
+	bot_id = None
+	teamsize = None
+	for opt, arg in optlist:
+		if opt in ('-i', '--id'):
+			bot_id = int(arg)
+		elif opt in ('-n', '--teamsize'):
+			teamsize = int(arg)
+
+	if bot_id is None or teamsize is None:
+		raise ValueError('Please enter both id and teamsize!')
+
+	return bot_id, teamsize
+
+if __name__ == '__main__':
+	main()
