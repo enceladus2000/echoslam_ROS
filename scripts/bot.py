@@ -9,10 +9,19 @@ import json
 from random import random
 
 def callback(msg):
-	print('Incoming message...')
-	print('bot_id:', msg.id.data)
-	print('bot_pos: {x: .2f},{y: .2f}'.format(x=msg.x.data, y=msg.y.data))
+	if msg.id.data != robot.id:
+		now = int(rospy.get_time())
+		print('{}: Incoming message...'.format(now))
+		print('bot_id:', msg.id.data)
+		print('bot_pos: {x: .2f},{y: .2f}'.format(x=msg.x.data, y=msg.y.data))
 
+	if (msg.id.data + 1) % robot.teamsize == robot.id:
+		print('My turn to transmit! Waiting for {:.2f}s...'.format(transmit_delay))
+		rospy.sleep(transmit_delay)
+		print('Transmitting...')
+		pub.publish(robot.msg)
+
+transmit_delay = 2.0	# time delay between transmissions, in seconds
 robot = Robot()
 sub = rospy.Subscriber(robot.topic_name, Bot, callback)
 pub = rospy.Publisher(robot.topic_name, Bot, queue_size=1)
@@ -27,10 +36,15 @@ def main():
 
 	robot.initRandomPos((0, 0), (10, 10))
 	robot.createMsg()
-	rospy.init_node('bot')
+	rospy.init_node(robot.getBotName())
+	print('Starting {bot}...'.format(bot=robot.getBotName()))
+
+	if robot.id == 0:
+		pub.publish(robot.msg)
+
+	rospy.spin()
 
 	
-
 
 def cl_args():
 	if len(sys.argv) <=1:

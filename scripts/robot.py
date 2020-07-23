@@ -15,7 +15,7 @@ class Robot:
 		self.pos = np.array(pos, dtype=np.float32)
 
 	def getBotName(self):
-		return 'bot' + str(id)
+		return 'bot' + str(self.id)
 
 	# args are corners of rectangle in cartesian
 	def initRandomPos(self, corner1, corner2):
