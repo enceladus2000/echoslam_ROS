@@ -1,0 +1,4 @@
+<launch>
+	<node pkg='echoslam' name='bot' type='bot'/>
+	
+</launch>
