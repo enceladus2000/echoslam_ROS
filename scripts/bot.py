@@ -8,12 +8,20 @@ import getopt
 import json
 from random import random
 
+"""TODO
+1. Calc relative position
+2. Add multiple transducers to robot class
+3. trilateration alg (w/o error)
+"""
+
 def callback(msg):
 	if msg.id.data != robot.id:
 		now = int(rospy.get_time())
 		print('{}: Incoming message...'.format(now))
 		print('bot_id:', msg.id.data)
 		print('bot_pos: {x: .2f},{y: .2f}'.format(x=msg.x.data, y=msg.y.data))
+
+
 
 	if (msg.id.data + 1) % robot.teamsize == robot.id:
 		print('My turn to transmit! Waiting for {:.2f}s...'.format(transmit_delay))
@@ -39,6 +47,7 @@ def main():
 	rospy.init_node(robot.getBotName())
 	print('Starting {bot}...'.format(bot=robot.getBotName()))
 
+	# break the ice
 	if robot.id == 0:
 		pub.publish(robot.msg)
 
