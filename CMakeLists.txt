@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(echoslam)
+project(echoslam_ROS)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -108,7 +108,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES echoslam
+#  LIBRARIES echoslam_ROS
 CATKIN_DEPENDS message_runtime geometry_msgs nav_msgs roscpp rospy std_msgs
 #  DEPENDS system_lib
 )
@@ -126,7 +126,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/echoslam.cpp
+#   src/${PROJECT_NAME}/echoslam_ROS.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -137,7 +137,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/echoslam_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/echoslam_ROS_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -201,7 +201,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_echoslam.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_echoslam_ROS.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
