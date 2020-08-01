@@ -4,10 +4,14 @@ import random
 import numpy as np
 
 class Robot:
-	# python recommendation for variables in class?
 	msg = None
 	topic_name = 'RF'
 	bot_name = None
+
+	# array of ultrasonic receivers' positions wrt center of bot
+	mic_array = [[0,0]]
+	# position of transmitter
+	transmitter_pos = [0,0]
 
 	def __init__(self, id=0, teamsize=1, pos=(0,0)):
 		self.id = id
@@ -27,5 +31,14 @@ class Robot:
 		self.msg.id.data = self.id
 		self.msg.x.data = self.pos[0]
 		self.msg.y.data = self.pos[1]
+
+	def setMicArray(self, num_mics, radius):
+		self.mic_array = []
+
+		for i in range(num_mics):
+			angle = 2*i*np.pi/num_mics
+			pos = radius * np.array([np.cos(angle), np.sin(angle)])
+			self.mic_array.append(pos)
+
 
 
