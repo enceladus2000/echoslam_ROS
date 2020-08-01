@@ -37,7 +37,7 @@ pub = rospy.Publisher(robot.topic_name, Bot, queue_size=1)
 def main():
 	try:
 		#robot.id, robot.teamsize = cl_args()
-		robot.teamsize = rospy.get_param("size")
+		robot.teamsize = rospy.get_param("/size")
 		robot.id = rospy.get_param("id")
 	except ValueError as error:
 		print(error)

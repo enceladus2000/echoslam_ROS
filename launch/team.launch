@@ -4,11 +4,12 @@
    <arg name="teamsize" default="1"/> 
    <arg name="dummy" default="$(eval arg('teamsize'))" />
    <param name="size" type="int" value="$(eval arg('teamsize'))"  />
-   <param name="id" type="int" value="$(eval arg('dummy'))"  />
-
   
-   <node name="$(eval 'bot' + str(arg('dummy')))" pkg="echoslam_ROS" type="bot.py"/>
-   
+
+   <group ns="$(eval 'bot' + str(arg('dummy')))">  
+      <node name="$(eval 'bot' + str(arg('dummy')))" pkg="echoslam_ROS" type="bot.py"/>
+      <param name="id" type="int" value="$(eval arg('dummy'))"  />
+   </group>
 
    <!-- recursively start new node -->
    <include file="$(find echoslam_ROS)/launch/team.launch" if="$(eval arg('dummy') - 1 > 0)">
