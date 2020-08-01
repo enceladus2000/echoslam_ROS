@@ -6,7 +6,7 @@ import numpy as np
 class Robot:
 	# python recommendation for variables in class?
 	msg = None
-	topic_name = 'RF'
+	topic_name = '/RF'
 	bot_name = None
 
 	def __init__(self, id=0, teamsize=1, pos=(0,0)):
