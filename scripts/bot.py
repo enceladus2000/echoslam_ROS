@@ -46,7 +46,7 @@ def main():
 
 	robot.initRandomPos((0, 0), (10, 10))
 	robot.createMsg()
-	rospy.init_node(robot.getBotName())
+	rospy.init_node("dummy_node_name")
 	print('Starting {bot}...'.format(bot=robot.getBotName()))
 
 	# break the ice
