@@ -1,9 +1,14 @@
 #! /usr/bin/env python
 
 from echoslam.msg import Bot
-from robot import Robot
-import rospy
 import sys
+import rospkg
+rospack = rospkg.RosPack()
+path = rospack.get_path('echoslam_ROS')
+sys.path.append(path)
+import src
+from src.robot import Robot
+import rospy
 import getopt
 import json
 from random import random
