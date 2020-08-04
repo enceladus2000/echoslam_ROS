@@ -2,18 +2,19 @@
 
    <!-- start node -->
    <arg name="teamsize" default="1"/> 
+   <arg name="dummy" default="$(eval arg('teamsize'))" />
+   <param name="size" type="int" value="$(eval arg('teamsize'))"  />
+  
 
-   <node
-   		name="$(eval 'bot' + str(arg('teamsize')))"
-   		args="$(eval '--id={}'.format(arg('teamsize')))"
-   		type="bot.py"
-   		pkg="echoslam"
-   		output="screen"
-   	/>
+   <group ns="$(eval 'bot' + str(arg('dummy')))">  
+      <node name="$(eval 'bot' + str(arg('dummy')))" pkg="echoslam_ROS" type="bot.py"/>
+      <param name="id" type="int" value="$(eval arg('dummy'))"  />
+   </group>
 
    <!-- recursively start new node -->
-   <include file="$(find echoslam)/launch/team.launch" if="$(eval arg('teamsize') - 1 > 0)">
-       <arg name="teamsize" value="$(eval arg('teamsize') - 1)"/>
+   <include file="$(find echoslam_ROS)/launch/team.launch" if="$(eval arg('dummy') - 1 > 0)">
+       <arg name="dummy" value="$(eval arg('dummy') - 1)"/>
+       <arg name="teamsize" value="$(eval arg('teamsize'))" />
    </include>
 
 </launch>

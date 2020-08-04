@@ -1,9 +1,14 @@
 #! /usr/bin/env python
 
 from echoslam.msg import Bot
-from robot import Robot
-import rospy
 import sys
+import rospkg
+rospack = rospkg.RosPack()
+path = rospack.get_path('echoslam_ROS')
+sys.path.append(path)
+import src
+from src.robot import Robot
+import rospy
 import getopt
 import json
 from random import random
@@ -36,7 +41,9 @@ pub = rospy.Publisher(robot.topic_name, Bot, queue_size=1)
 
 def main():
 	try:
-		robot.id, robot.teamsize = cl_args()
+		#robot.id, robot.teamsize = cl_args()
+		robot.teamsize = rospy.get_param("/size")
+		robot.id = rospy.get_param("id")
 	except ValueError as error:
 		print(error)
 		print('Exiting...')
@@ -44,7 +51,7 @@ def main():
 
 	robot.initRandomPos((0, 0), (10, 10))
 	robot.createMsg()
-	rospy.init_node(robot.getBotName())
+	rospy.init_node("dummy_node_name")
 	print('Starting {bot}...'.format(bot=robot.getBotName()))
 
 	# break the ice
@@ -55,27 +62,27 @@ def main():
 
 	
 
-def cl_args():
-	if len(sys.argv) <=1:
-		raise ValueError('Please enter id and teamsize.')
+# def cl_args():
+# 	if len(sys.argv) <=1:
+# 		raise ValueError('Please enter id and teamsize.')
 		
-	try:
-		optlist, _ = getopt.getopt(sys.argv[1:], "i:n:", ['id=','teamsize=']) 
-	except getopt.GetoptError:
-		raise ValueError('Invalid arguments!')
+# 	try:
+# 		optlist, _ = getopt.getopt(sys.argv[1:], "i:n:", ['id=','teamsize=']) 
+# 	except getopt.GetoptError:
+# 		raise ValueError('Invalid arguments!')
 
-	bot_id = None
-	teamsize = None
-	for opt, arg in optlist:
-		if opt in ('-i', '--id'):
-			bot_id = int(arg)
-		elif opt in ('-n', '--teamsize'):
-			teamsize = int(arg)
+# 	bot_id = None
+# 	teamsize = None
+# 	for opt, arg in optlist:
+# 		if opt in ('-i', '--id'):
+# 			bot_id = int(arg)
+# 		elif opt in ('-n', '--teamsize'):
+# 			teamsize = int(arg)
 
-	if bot_id is None or teamsize is None:
-		raise ValueError('Please enter both id and teamsize!')
+# 	if bot_id is None or teamsize is None:
+# 		raise ValueError('Please enter both id and teamsize!')
 
-	return bot_id, teamsize
+# 	return bot_id, teamsize
 
 if __name__ == '__main__':
 	main()

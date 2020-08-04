@@ -1,11 +1,10 @@
-# hashbang required?
 from echoslam.msg import Bot
 import random 
 import numpy as np
 
 class Robot:
 	msg = None
-	topic_name = 'RF'
+	topic_name = '/RF'
 	bot_name = None
 
 	# array of ultrasonic receivers' positions wrt center of bot
@@ -32,13 +31,11 @@ class Robot:
 		self.msg.x.data = self.pos[0]
 		self.msg.y.data = self.pos[1]
 
-	def setMicArray(self, num_mics, radius):
-		self.mic_array = []
+	# def setMicArray(self, num_mics, radius):
+	# 	self.mic_array = []
 
-		for i in range(num_mics):
-			angle = 2*i*np.pi/num_mics
-			pos = radius * np.array([np.cos(angle), np.sin(angle)])
-			self.mic_array.append(pos)
-
-
+	# 	for i in range(num_mics):
+	# 		angle = 2*i*np.pi/num_mics
+	# 		pos = radius * np.array([np.cos(angle), np.sin(angle)])
+	# 		self.mic_array.append(pos)
 
