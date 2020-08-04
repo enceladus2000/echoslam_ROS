@@ -1,4 +1,19 @@
-<launch>
-	<node pkg='echoslam' name='bot' type='bot'/>
-	
+<launch> 
+
+   <!-- start node -->
+   <arg name="teamsize" default="1"/> 
+
+   <node
+   		name="$(eval 'bot' + str(arg('teamsize')))"
+   		args="$(eval '--id={}'.format(arg('teamsize')))"
+   		type="bot.py"
+   		pkg="echoslam"
+   		output="screen"
+   	/>
+
+   <!-- recursively start new node -->
+   <include file="$(find echoslam)/launch/team.launch" if="$(eval arg('teamsize') - 1 > 0)">
+       <arg name="teamsize" value="$(eval arg('teamsize') - 1)"/>
+   </include>
+
 </launch>
