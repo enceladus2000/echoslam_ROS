@@ -14,6 +14,10 @@ sys.path.append(path)
 import src
 from src.robot import Robot
 
+transmit_delay = 1.0	# time delay between transmissions, in seconds
+robot = Robot()			# create Robot object
+
+# gets called once bot receives message on topic
 def callback(msg):
 	# ignore messages sent by itself
 	if msg.id.data != robot.id:
@@ -29,9 +33,6 @@ def callback(msg):
 		rospy.sleep(transmit_delay)
 		print('Transmitting...')
 		pub.publish(robot.msg)
-
-transmit_delay = 1.0	# time delay between transmissions, in seconds
-robot = Robot()			# create Robot object
 
 # bot pubs and subs to topic
 sub = rospy.Subscriber(robot.topic_name, Bot, callback)
@@ -62,6 +63,7 @@ def main():
 		pub.publish(robot.msg)
 
 	rospy.spin()
+
 
 	
 # deprecated

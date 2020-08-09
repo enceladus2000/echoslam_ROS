@@ -7,10 +7,8 @@ class Robot:
 	topic_name = '/RF'
 	bot_name = None
 
-	# array of mics' positions wrt center of bot
-	mic_array = [[0,0]]
-	# position of transmitter wrt center of bot
-	transmitter_pos = [0,0]
+	mic_array = [[0,0]]		# array of mics' positions wrt center of bot
+	transmitter_pos = [0,0]	# position of transmitter wrt center of bot
 
 	def __init__(self, id=0, teamsize=1, pos=(0,0)):
 		self.id = id
