@@ -7,8 +7,16 @@
   
 
    <group ns="$(eval 'bot' + str(arg('dummy')))">  
-      <node name="$(eval 'bot' + str(arg('dummy')))" pkg="echoslam_ROS" type="bot.py"/>
-      <param name="id" type="int" value="$(eval arg('dummy'))"  />
+      <node
+        name="$(eval 'bot' + str(arg('dummy')))"
+        pkg="echoslam_ROS" type="bot.py"
+        output="screen"
+      />
+      <param
+        name="id"
+        type="int"
+        value="$(eval arg('dummy'))"
+      />
    </group>
 
    <!-- recursively start new node -->

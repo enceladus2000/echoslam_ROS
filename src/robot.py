@@ -7,9 +7,9 @@ class Robot:
 	topic_name = '/RF'
 	bot_name = None
 
-	# array of ultrasonic receivers' positions wrt center of bot
+	# array of mics' positions wrt center of bot
 	mic_array = [[0,0]]
-	# position of transmitter
+	# position of transmitter wrt center of bot
 	transmitter_pos = [0,0]
 
 	def __init__(self, id=0, teamsize=1, pos=(0,0)):
@@ -25,6 +25,8 @@ class Robot:
 		self.pos[0] = random.uniform(corner1[0], corner2[0])
 		self.pos[1] = random.uniform(corner1[1], corner2[1])
 
+	# compile bot info into a message
+	# must call 
 	def createMsg(self):
 		self.msg = Bot()
 		self.msg.id.data = self.id
