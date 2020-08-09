@@ -15,7 +15,9 @@ import src
 from src.robot import Robot
 
 def callback(msg):
+	# ignore messages sent by itself
 	if msg.id.data != robot.id:
+		# print received message with epoch
 		now = int(rospy.get_time())
 		print('{}: Incoming message...'.format(now))
 		print('bot_id:', msg.id.data)
@@ -29,7 +31,9 @@ def callback(msg):
 		pub.publish(robot.msg)
 
 transmit_delay = 1.0	# time delay between transmissions, in seconds
-robot = Robot()
+robot = Robot()			# create Robot object
+
+# bot pubs and subs to topic
 sub = rospy.Subscriber(robot.topic_name, Bot, callback)
 pub = rospy.Publisher(robot.topic_name, Bot, queue_size=3)
 
@@ -44,9 +48,12 @@ def main():
 		print('Exiting...')
 		sys.exit(2)
 
-	robot.initRandomPos((0, 0), (10, 10))
-	robot.createMsg()
-	rospy.init_node(robot.bot_name)
+	robot.initRandomPos((0, 0), (10, 10))		# spawn bot in some random position
+	robot.createMsg()							# must call before pub.publish(robot.msg)
+
+	# node name is determined by the launch file
+	# but init_node still needs to be called			
+	rospy.init_node(robot.bot_name)	
 	print('Starting {}...'.format(robot.bot_name))
 
 	# break the ice
