@@ -38,6 +38,7 @@ def main():
 	try:
 		robot.teamsize = rospy.get_param("/size")
 		robot.id = rospy.get_param("id")
+		robot.bot_name = 'bot' + str(robot.id)
 	except KeyError as error:
 		print('The parameter {} was not found'.format(error))
 		print('Exiting...')
@@ -45,17 +46,18 @@ def main():
 
 	robot.initRandomPos((0, 0), (10, 10))
 	robot.createMsg()
-	rospy.init_node("dummy_node_name")		# required??
-	print('Starting {bot}...'.format(bot=robot.getBotName()))
+	rospy.init_node(robot.bot_name)
+	print('Starting {}...'.format(robot.bot_name))
 
 	# break the ice
+	# bot1 will be initialised last, and it will start the msg chain
 	if robot.id == 1:
 		pub.publish(robot.msg)
 
 	rospy.spin()
 
 	
-
+# deprecated
 def cl_args():
 	if len(sys.argv) <=1:
 		raise ValueError('Please enter id and teamsize.')
