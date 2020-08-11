@@ -42,18 +42,18 @@ class Robot:
 			pos = radius * np.array([np.cos(angle), np.sin(angle)])
 			self.mic_array.append(pos)
 
-	# returns DOFs aka distance of flights (of acoustic signal) from a source
 	# source_pos is 2D np.array of global position of other bot's transmitter
-	def calcDOFs(self, source_pos):
-		DOFs = []
+	def getMicDOFs(self, source_pos):
+		micDOFs = []
 		for mic_pos in self.mic_array:
-			DOFs.append(distance(mic_pos+self.pos, source_pos))
+			thisDOF = distance(mic_pos+self.pos, source_pos)
+			micDOFs.append((mic_pos, thisDOF))
 
-		return np.array(DOFs)
+		return micDOFs
 
 	# returns 2D vector of relative position of other robot wrt this robot
-	def trilaterate(self, DOFs):
-		est_rel_pos = geo_trilaterate(self.mic_array, DOFs)
+	def trilaterate(self, micDOFs):
+		est_rel_pos = geo_trilaterate(micDOFs)
 		return est_rel_pos
 
 

@@ -2,13 +2,13 @@ import numpy as np
 from itertools import combinations
 from pointhelper import *
 
-def geo_trilaterate(mic_array, DOFs):
-	mdata = list(zip(mic_array, DOFs))
-
+# micDOFs is list of tuples
+# each tuple is (mic_pos, DOF_from_src)
+def geo_trilaterate(micDOFs):
 	sols = []
 	solvector = np.zeros(2)
 	# iterate thru each combination of mics 
-	for mdata1, mdata2 in combinations(mdata, 2):
+	for mdata1, mdata2 in combinations(micDOFs, 2):
 		d1 = mdata1[1]
 		d2 = mdata2[1]
 		mic1_pos = mdata1[0]
@@ -20,7 +20,8 @@ def geo_trilaterate(mic_array, DOFs):
 		sols.append([sol1, sol2])
 		solvector += sol1/norm(sol1) + sol2/norm(sol2)
 
-		solvector /= len(sols)
+	
+	solvector /= len(sols)	# normalise
 
 	true_sols = []
 	# iterate thru sols, find the correct sol from pair
@@ -63,6 +64,7 @@ def circle_intersection(p1, p2, d1, d2):
 	sol2 = p1 + rotate(np.array((x,yn)), theta)
 
 	return [sol1, sol2]
+
 
 
 

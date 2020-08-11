@@ -11,7 +11,7 @@ from random import random
 """TODO:
 1. initialise bots randomly without bumping into each other?
 2. Handle out of range errors in geo_trilaterate
-3. Terrible geo_trilaterate error!!
+3. Terrible geo_trilaterate error!! Test it!
 
 """
 
@@ -28,10 +28,9 @@ def callback(msg):
 	if msg.id.data != robot.id:
 		print(msg)
 		source_pos = np.array((msg.x.data, msg.y.data))
-		DOFs = robot.calcDOFs(source_pos)
-		rel_pos = robot.trilaterate(DOFs)
+		micDOFs = robot.getMicDOFs(source_pos)
+		rel_pos = robot.trilaterate(micDOFs)
 		print('Source position: ', source_pos)
-		print('DOFs:', DOFs)
 		print('Estimated relative position:', rel_pos)
 		print('Actual relative position:', source_pos-robot.pos)
 
