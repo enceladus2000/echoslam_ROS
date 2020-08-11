@@ -1,6 +1,8 @@
 from echoslam.msg import Bot
 import random 
 import numpy as np
+from pointhelper import *
+from trilaterate import *
 
 class Robot:
 	msg = None
@@ -31,11 +33,28 @@ class Robot:
 		self.msg.x.data = self.pos[0]
 		self.msg.y.data = self.pos[1]
 
-	# def setMicArray(self, num_mics, radius):
-	# 	self.mic_array = []
+	# create circular mic array
+	def setMicArray(self, num_mics, radius):
+		self.mic_array = []
 
-	# 	for i in range(num_mics):
-	# 		angle = 2*i*np.pi/num_mics
-	# 		pos = radius * np.array([np.cos(angle), np.sin(angle)])
-	# 		self.mic_array.append(pos)
+		for i in range(num_mics):
+			angle = 2*i*np.pi/num_mics
+			pos = radius * np.array([np.cos(angle), np.sin(angle)])
+			self.mic_array.append(pos)
+
+	# returns DOFs aka distance of flights (of acoustic signal) from a source
+	# source_pos is 2D np.array of global position of other bot's transmitter
+	def calcDOFs(self, source_pos):
+		DOFs = []
+		for mic_pos in self.mic_array:
+			DOFs.append(distance(mic_pos+self.pos, source_pos))
+
+		return np.array(DOFs)
+
+	# returns 2D vector of relative position of other robot wrt this robot
+	def trilaterate(self, DOFs):
+		est_rel_pos = geo_trilaterate(self.mic_array, DOFs)
+		return est_rel_pos
+
+
 
