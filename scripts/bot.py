@@ -11,7 +11,8 @@ from random import random
 """TODO:
 1. initialise bots randomly without bumping into each other?
 2. Handle out of range errors in geo_trilaterate
-3. Terrible geo_trilaterate error!! Test it!
+3. DONE Terrible geo_trilaterate error!! Test it!
+4. Mic array class?
 
 """
 
