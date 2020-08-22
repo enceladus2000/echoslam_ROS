@@ -9,24 +9,25 @@ import numpy as np
 from random import random
 
 """TODO:
-1. initialise bots randomly without bumping into each other?
-2. Handle out of range errors in geo_trilaterate
-3. DONE Terrible geo_trilaterate error!! Test it!
-4. Mic array class?
-
+1. add audio sim function placeholder
+2. implement aadhar's time lag code
+3. orientation?
+4. mic array class?
+5. Decide objects heirarchy lol
 """
 
 # import robot class from src folder
 rospack = rospkg.RosPack()
 path = rospack.get_path('echoslam_ROS')
 sys.path.append(path)
-import src
 from src.robot import Robot
+from src.acoustics import simReceivedWaveform, calcTOFs
 
 # gets called once bot receives message on topic
 def callback(msg):
 	# ignore messages sent by itself
 	if msg.id.data != robot.id:
+		print(robot.bot_name + ' has received a message...')
 		print(msg)
 		source_pos = np.array((msg.x.data, msg.y.data))
 		micDOFs = robot.getMicDOFs(source_pos)
@@ -34,6 +35,13 @@ def callback(msg):
 		print('Source position: ', source_pos)
 		print('Estimated relative position:', rel_pos)
 		print('Actual relative position:', source_pos-robot.pos)
+		# source_pos = np.array((msg.x.data, msg.y.data))
+		# rec_waveforms = simReceivedWaveform(robot.getMicPositions, souce_pos)
+		# # TOFs = calcTOFs(rec_waveforms)
+		# robot.trilaterate(TOFs)
+
+		# print results
+
 
 	# check if bot that just transmitted is the one before
 	if msg.id.data % robot.teamsize == robot.id - 1:
