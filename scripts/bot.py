@@ -27,17 +27,9 @@ from src.acoustics import simReceivedWaveform, calcTOFs
 def callback(msg):
 	# ignore messages sent by itself
 	if msg.id.data != robot.id:
-		print(robot.bot_name + ' has received a message...')
-		print(msg)
 		source_pos = np.array((msg.x.data, msg.y.data))
-		micDOFs = robot.getMicDOFs(source_pos)
-		rel_pos = robot.trilaterate(micDOFs)
-		print('Source position: ', source_pos)
-		print('Estimated relative position:', rel_pos)
-		print('Actual relative position:', source_pos-robot.pos)
-		# source_pos = np.array((msg.x.data, msg.y.data))
-		# rec_waveforms = simReceivedWaveform(robot.getMicPositions, souce_pos)
-		# # TOFs = calcTOFs(rec_waveforms)
+		# waveforms = robot.recordWaveforms(source_pos)
+		# TOFs = robot.calcTOFs()
 		# robot.trilaterate(TOFs)
 
 		# print results
