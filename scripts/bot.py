@@ -9,11 +9,7 @@ import numpy as np
 from random import random
 
 """TODO:
-1. add audio sim function placeholder
-2. implement aadhar's time lag code
-3. orientation?
-4. mic array class?
-5. Decide objects heirarchy lol
+
 """
 
 # import robot class from src folder
@@ -28,12 +24,12 @@ def callback(msg):
 	# ignore messages sent by itself
 	if msg.id.data != robot.id:
 		source_pos = np.array((msg.x.data, msg.y.data))
-		# waveforms = robot.recordWaveforms(source_pos)
-		# TOFs = robot.calcTOFs()
-		# robot.trilaterate(TOFs)
+		waveforms = robot.recordWaveforms(source_pos)
+		TOFs = robot.calcTOFs(waveforms)
+		est_rel_pos = robot.trilaterate(TOFs)
 
-		# print results
-
+		print('Estimated Relative Position:', est_rel_pos)
+		print('Actual Relative Position:', source_pos-robot.pos)
 
 	# check if bot that just transmitted is the one before
 	if msg.id.data % robot.teamsize == robot.id - 1:

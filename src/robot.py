@@ -3,6 +3,7 @@ import random
 import numpy as np
 from pointhelper import *
 from trilaterate import *
+import acoustics as ac 
 
 class Robot:
 	msg = None
@@ -11,7 +12,8 @@ class Robot:
 
 	mic_array = [[0,0]]		# array of mics' positions wrt center of bot
 	transmitter_pos = [0,0]	# position of transmitter wrt center of bot
-
+	transmitted_wave = None
+	
 	def __init__(self, id=0, teamsize=1, pos=(0,0)):
 		self.id = id
 		self.teamsize = teamsize
@@ -55,6 +57,29 @@ class Robot:
 	def trilaterate(self, micDOFs):
 		est_rel_pos = geo_trilaterate(micDOFs)
 		return est_rel_pos
+
+	def recordWaveforms(self, source_pos):
+		tm_wave = robot.getTransmittedWave()
+		waveforms = []
+		for mic_pos in self.mic_array:
+			wave = ac.simulateWaveform(mic_pos, source_pos, tm_wave)
+			waveforms.append(wave)
+		
+		return waveforms
+
+	def calcTOFs(self, waveforms):
+		tm_wave = robot.getTransmittedWave()
+		TOFs = []
+		for wave in waveforms:
+			td = ac.calcTimeDelay(tm_wave, wave)
+			TOFs.append(TOFs)
+
+		return TOFs
+
+	def getTransmittedWave(self):
+		if self.transmitted_wave is None:
+			self.transmitted_wave = ac.generatePulse()
+		return self.transmitted_wave
 
 
 
