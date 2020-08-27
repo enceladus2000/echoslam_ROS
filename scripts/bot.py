@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 
-from echoslam.msg import Bot
+from echoslam.msg import Bot #28/08/2020 : Aditya changed echoslam to echoslam_ROS in this line.
+from echoslam_ROS.srv import *
+from std_msgs.msg import Int32
 import sys
 import rospkg
 import rospy
@@ -17,6 +19,15 @@ from random import random
 """
 
 # import robot class from src folder
+
+###### 20/08/2020 : Aditya
+def bot_server_client(bot_id):
+	rospy.wait_for_service('bot_service')
+	bot_server_proxy = rospy.ServiceProxy('bot_service', BotService)
+	response = bot_server_proxy(bot_id)
+	return response
+######
+
 rospack = rospkg.RosPack()
 path = rospack.get_path('echoslam_ROS')
 sys.path.append(path)
@@ -67,7 +78,8 @@ def main():
 		print('Exiting...')
 		sys.exit(2)
 
-	robot.initRandomPos((0, 0), (5, 5))		# spawn bot in some random position
+	#robot.initRandomPos((0, 0), (5, 5))		# spawn bot in some random position
+	robot.setPos(bot_server_client(Int32(robot.id)))
 	robot.setMicArray(6, .1)
 	robot.createMsg()							# must call before pub.publish(robot.msg)
 

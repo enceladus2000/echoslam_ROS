@@ -25,6 +25,12 @@ class Robot:
 		self.pos[0] = random.uniform(corner1[0], corner2[0])
 		self.pos[1] = random.uniform(corner1[1], corner2[1])
 
+	### 20/08/2020 : Aditya Bidwai
+	def setPos(self, bot_msg):
+		self.pos[0] = bot_msg.x.data
+		self.pos[1] = bot_msg.y.data
+	###
+
 	# compile bot info into a message
 	# must call 
 	def createMsg(self):
