@@ -1,4 +1,4 @@
-from echoslam.msg import Bot
+from echoslam_ROS.msg import Bot
 import random 
 import numpy as np
 from pointhelper import *
@@ -26,9 +26,9 @@ class Robot:
 		self.pos[1] = random.uniform(corner1[1], corner2[1])
 
 	### 20/08/2020 : Aditya Bidwai
-	def setPos(self, bot_msg):
-		self.pos[0] = bot_msg.x.data
-		self.pos[1] = bot_msg.y.data
+	def setPose(self, response_obj):
+		self.pos[0] = response_obj.bot.x.data
+		self.pos[1] = response_obj.bot.y.data
 	###
 
 	# compile bot info into a message

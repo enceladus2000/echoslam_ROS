@@ -4,7 +4,13 @@
    <arg name="teamsize" default="1"/> 
    <arg name="dummy" default="$(eval arg('teamsize'))" />
    <param name="size" type="int" value="$(eval arg('teamsize'))"  />
-   <node name="bot_server_node" pkg="echoslam_ROS" type="bot_server_node.py" if="$(eval arg('dummy') == arg('teamsize'))"/>  
+   <node 
+   		name="bot_server_node" 
+   		pkg="echoslam_ROS" 
+   		type="bot_server_node.py" 
+   		if="$(eval arg('dummy') == arg('teamsize'))"
+   		output="screen"
+   />  
 
    <group ns="$(eval 'bot' + str(arg('dummy')))">  
       <node
