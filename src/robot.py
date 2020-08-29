@@ -27,17 +27,17 @@ class Robot:
 		self.mic_array = ac.MicArray(num_mics, marray_radius,
 								sampling_rate, num_samples, self.pos)
 
-	def getBotName(self):
+	def get_bot_name(self):
 		return 'bot' + str(self.id)
 
 	# args are corners of rectangle in cartesian
-	def initRandomPos(self, corner1, corner2):
+	def init_random_pos(self, corner1, corner2):
 		self.pos[0] = random.uniform(corner1[0], corner2[0])
 		self.pos[1] = random.uniform(corner1[1], corner2[1])
 
 	# compile bot info into a message
 	# must call 
-	def createMsg(self):
+	def init_msg(self):
 		self.msg = Bot()
 		self.msg.id.data = self.id
 		self.msg.x.data = self.pos[0]
@@ -56,6 +56,12 @@ class Robot:
 			self.create_transmitted_wave(1000)
 		return self.transmitted_wave
 
+	def record_waveforms(self, source_pos):
+		tm_wave = self.get_transmitted_wave()
+		self.mic_array.simulate_waveforms(source_pos, tm_wave)
+		
+		return self.mic_array.waveforms
+
 	# source_pos is 2D np.array of global position of other bot's transmitter
 	def getMicDOFs(self, source_pos):
 		micDOFs = []
@@ -69,22 +75,6 @@ class Robot:
 	def trilaterate(self, micDOFs):
 		est_rel_pos = geo_trilaterate(micDOFs)
 		return est_rel_pos
-
-	def recordWaveforms(self, source_pos):
-		tm_wave = self.get_transmitted_wave()
-		self.mic_array.simulate_waveforms(source_pos, tm_wave)
-		
-		return mic_array.waveforms
-
-	def calcTOFs(self, waveforms):
-		tm_wave = robot.get_transmitted_wave()
-		TOFs = []
-		for wave in waveforms:
-			td = ac.calcTimeDelay(tm_wave, wave)
-			TOFs.append(TOFs)
-
-		return TOFs
-
 	
 
 
