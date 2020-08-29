@@ -62,14 +62,14 @@ class Robot:
 		
 		return self.mic_array.waveforms
 
-	# source_pos is 2D np.array of global position of other bot's transmitter
-	def getMicDOFs(self, source_pos):
-		micDOFs = []
-		for mic_pos in self.mic_array:
-			thisDOF = distance(mic_pos+self.pos, source_pos)
-			micDOFs.append((mic_pos, thisDOF))
+	# # source_pos is 2D np.array of global position of other bot's transmitter
+	# def getMicDOFs(self, source_pos):
+	# 	micDOFs = []
+	# 	for mic_pos in self.mic_array:
+	# 		thisDOF = distance(mic_pos+self.pos, source_pos)
+	# 		micDOFs.append((mic_pos, thisDOF))
 
-		return micDOFs
+	# 	return micDOFs
 
 	# returns 2D vector of relative position of other robot wrt this robot
 	def trilaterate(self, micDOFs):

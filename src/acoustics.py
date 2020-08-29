@@ -1,8 +1,8 @@
 import numpy as np 
 import pointhelper as ph
-from scipy import signal
+# from scipy import signal
 
-# All properties of air at 25°C and atm pressure
+# All properties of air at 25C and atm pressure
 sound_speed = 343  # m/s
 eta = 1.844E-5  # Dynamic viscosity in kg/m.s
 rho = 1.1845  # Fluid density in kg/m^3
