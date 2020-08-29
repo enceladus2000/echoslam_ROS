@@ -32,6 +32,25 @@ class Waveform:
 
 	# TODO: construcotr/classmethod for arbitrary signals?
 
+	def calcTimeDelay(self, og_wave, dly_wave, sampling_rate):
+		'''
+		Calculates how much dly_wave is behind og_wave, using cross correlation(?)
+			Parameters:
+				og_wave (np.array): original wave
+				dly_wave (np.array): delayed wave (whose delay we want to find)
+				sampling_rate (int): 
+			Returns:
+				delay (float): in seconds
+		'''
+		n=len(og_wave)
+		corr = signal.correlate(dly_wave, og_wave, mode='same') / np.sqrt(signal.correlate(og_wave, og_wave, mode='same')[int(n/2)] * signal.correlate(dly_wave, dly_wave, mode='same')[int(n/2)])
+		delay_arr = np.linspace(-n/sampling_rate, n/sampling_rate, len(corr))
+		print(len(delay_arr))
+		delay = delay_arr[np.argmax(corr)]
+		print('dly_wave is ' + str(delay) + ' behind og_wave')
+
+		return delay
+
 # simple omnidirectional mic
 class Mic:
 	# position must be a np.array(2)
@@ -104,25 +123,6 @@ class MicArray:
 		for mic in self.mics:
 			self.waveforms.append(mic.simulate_waveform(src_pos, src_wave))
 		return self.waveforms		
-
-# def calcTimeDelay(og_wave, dly_wave, sampling_rate):
-# 	'''
-# 	Calculates how much dly_wave is behind og_wave, using cross correlation(?)
-# 		Parameters:
-# 			og_wave (np.array): original wave
-# 			dly_wave (np.array): delayed wave (whose delay we want to find)
-# 			sampling_rate (int): 
-# 		Returns:
-# 			delay (float): in seconds
-# 	'''
-# 	n=len(og_wave)
-# 	corr = signal.correlate(dly_wave, og_wave, mode='same') / np.sqrt(signal.correlate(og_wave, og_wave, mode='same')[int(n/2)] * signal.correlate(dly_wave, dly_wave, mode='same')[int(n/2)])
-# 	delay_arr = np.linspace(-n/sampling_rate, n/sampling_rate, len(corr))
-# 	print(len(delay_arr))
-# 	delay = delay_arr[np.argmax(corr)]
-# 	print('dly_wave is ' + str(delay) + ' behind og_wave')
-
-# 	return delay
 
 # def calcTOFs(og_wave, rec_waveforms):
 # 	'''

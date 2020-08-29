@@ -8,16 +8,24 @@ import acoustics as ac
 class Robot:
 	msg = None
 	topic_name = '/RF'
-	bot_name = None
 
-	mic_array = [[0,0]]		# array of mics' positions wrt center of bot
 	transmitter_pos = [0,0]	# position of transmitter wrt center of bot
 	transmitted_wave = None
 	
-	def __init__(self, id=0, teamsize=1, pos=(0,0)):
+	def __init__(self, id=0, teamsize=1, radius=1, pos=(0,0)):
 		self.id = id
-		self.teamsize = teamsize
-		self.pos = np.array(pos, dtype=np.float32)
+		self.teamsize = teamsize		# number of bots in a team
+		self.bot_radius = radius		# radius of the circular bot
+		self.pos = np.array(pos, dtype=np.float32)	# abs position of bot
+
+	def init_mic_array(self, num_mics, radius=None, sampling_rate=44100, num_samples=200):
+		if radius is None:
+			marray_radius = self.bot_radius
+		else:
+			marray_radius = radius
+		
+		self.mic_array = ac.MicArray(num_mics, marray_radius,
+								sampling_rate, num_samples, self.pos)
 
 	def getBotName(self):
 		return 'bot' + str(self.id)
@@ -35,14 +43,18 @@ class Robot:
 		self.msg.x.data = self.pos[0]
 		self.msg.y.data = self.pos[1]
 
-	# create circular mic array
-	def setMicArray(self, num_mics, radius):
-		self.mic_array = []
-
-		for i in range(num_mics):
-			angle = 2*i*np.pi/num_mics
-			pos = radius * np.array([np.cos(angle), np.sin(angle)])
-			self.mic_array.append(pos)
+	def create_transmitted_wave(self, w_freq):
+		self.transmitted_wave = ac.Waveform(
+				freq=w_freq,
+				sampling_rate=self.mic_array.sampling_rate,
+				num_samples=self.mic_array.num_samples
+			)
+		return self.transmitted_wave
+	
+	def get_transmitted_wave(self):
+		if self.transmitted_wave is None:
+			self.create_transmitted_wave(1000)
+		return self.transmitted_wave
 
 	# source_pos is 2D np.array of global position of other bot's transmitter
 	def getMicDOFs(self, source_pos):
@@ -59,16 +71,13 @@ class Robot:
 		return est_rel_pos
 
 	def recordWaveforms(self, source_pos):
-		tm_wave = robot.getTransmittedWave()
-		waveforms = []
-		for mic_pos in self.mic_array:
-			wave = ac.simulateWaveform(mic_pos, source_pos, tm_wave)
-			waveforms.append(wave)
+		tm_wave = self.get_transmitted_wave()
+		self.mic_array.simulate_waveforms(source_pos, tm_wave)
 		
-		return waveforms
+		return mic_array.waveforms
 
 	def calcTOFs(self, waveforms):
-		tm_wave = robot.getTransmittedWave()
+		tm_wave = robot.get_transmitted_wave()
 		TOFs = []
 		for wave in waveforms:
 			td = ac.calcTimeDelay(tm_wave, wave)
@@ -76,10 +85,7 @@ class Robot:
 
 		return TOFs
 
-	def getTransmittedWave(self):
-		if self.transmitted_wave is None:
-			self.transmitted_wave = ac.generatePulse()
-		return self.transmitted_wave
+	
 
 
 
