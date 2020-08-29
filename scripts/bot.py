@@ -9,7 +9,9 @@ import numpy as np
 from random import random
 
 """TODO:
-
+1. robot.calcTOFs()
+2. robot.trilaterate(tofs) instead of dofs
+3. implement pub, sub and callback within Robot class
 """
 
 # import robot class from src folder
@@ -23,7 +25,9 @@ def callback(msg):
 	# ignore messages sent by itself
 	if msg.id.data != robot.id:
 		source_pos = np.array((msg.x.data, msg.y.data))
-		
+		robot.record_waveforms(source_pos)
+		# tofs = robot.calc_TOFs()
+		# est_src_pos = robot.trilaterate(tofs)
 		print("Actual rel_src_pos = ", source_pos-robot.pos)
 
 	# check if bot that just transmitted is the one before
