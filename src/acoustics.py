@@ -8,6 +8,50 @@ eta = 1.844E-5  # Dynamic viscosity in kg/m.s
 rho = 1.1845  # Fluid density in kg/m^3
 samplingRate = 44000 # Hz
 
+# simple omnidirectional mic
+class Mic:
+	# position must be a np.array(2)
+	def __init__(self, pos):
+		self.pos = pos
+
+	# convenient for debugging
+	def __repr__(self):
+		return 'Mic: pos = {p}'.format(p=self.pos)
+
+	def simulate_waveform(self, src_pos, src_wave, sampling_rate, num_samples):
+		pass
+
+# class containing array of Mic[]
+class MicArray:
+	def __init__(self, array_size, radius, samping_rate=44100, num_samples=200):
+		self.mics = []
+		self.array_size = array_size
+		self.sampling_rate = sampling_rate
+		self.num_samples = num_samples
+
+		# TODO: make this circular array instead
+		# for x in np.linspace(-length/2, length/2, self.array_size):
+		# 	self.mics.append(Mic((x, 0)))
+
+	# iterable, must be able to be iterated, eg: for mic in micarray
+	def __iter__(self):
+		self.i = 0
+		return self
+
+	def __next__(self):
+		if self.i < self.array_size:
+			temp_mic = self.mics[self.i]
+			self.i += 1
+			return temp_mic
+		else:
+			raise StopIteration
+	
+	def __getitem__(self, index):
+		return self.mics[index]
+	
+	def __len__(self):
+		return self.array_size
+
 class generateWaveform:
 	'''
 	Creates a sine waveform
