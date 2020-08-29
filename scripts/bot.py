@@ -17,19 +17,14 @@ rospack = rospkg.RosPack()
 path = rospack.get_path('echoslam_ROS')
 sys.path.append(path)
 from src.robot import Robot
-from src.acoustics import simReceivedWaveform, calcTOFs
 
 # gets called once bot receives message on topic
 def callback(msg):
 	# ignore messages sent by itself
 	if msg.id.data != robot.id:
 		source_pos = np.array((msg.x.data, msg.y.data))
-		waveforms = robot.recordWaveforms(source_pos)
-		TOFs = robot.calcTOFs(waveforms)
-		est_rel_pos = robot.trilaterate(TOFs)
-
-		print('Estimated Relative Position:', est_rel_pos)
-		print('Actual Relative Position:', source_pos-robot.pos)
+		
+		print("Actual rel_src_pos = ", source_pos-robot.pos)
 
 	# check if bot that just transmitted is the one before
 	if msg.id.data % robot.teamsize == robot.id - 1:
@@ -37,7 +32,7 @@ def callback(msg):
 		pub.publish(robot.msg)
 
 
-robot = Robot()			# create Robot object
+robot = Robot(radius=0.2)			# create Robot object
 sub = rospy.Subscriber(robot.topic_name, Bot, callback)
 pub = rospy.Publisher(robot.topic_name, Bot, queue_size=3)
 
@@ -49,20 +44,19 @@ def main():
 	try:
 		robot.teamsize = rospy.get_param("/size")
 		robot.id = rospy.get_param("id")
-		robot.bot_name = 'bot' + str(robot.id)
 	except KeyError as error:
 		print('The parameter {} was not found'.format(error))
 		print('Exiting...')
 		sys.exit(2)
 
-	robot.initRandomPos((0, 0), (5, 5))		# spawn bot in some random position
-	robot.setMicArray(6, .1)
-	robot.createMsg()							# must call before pub.publish(robot.msg)
+	robot.init_random_pos((0, 0), (5, 5))		# spawn bot in some random position
+	robot.init_mic_array(num_mics=6, radius=0.1)
+	robot.init_msg()							# must call before pub.publish(robot.msg)
 
 	# node name is determined by the launch file
 	# but init_node still needs to be called			
-	rospy.init_node(robot.bot_name)	
-	print('Starting {}...'.format(robot.bot_name))
+	rospy.init_node(robot.get_bot_name())	
+	print('Starting {}...'.format(robot.get_bot_name()))
 
 	# bot1 will be initialised last, and it will start the msg chain
 	if robot.id == 1:
