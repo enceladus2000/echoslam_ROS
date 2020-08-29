@@ -9,9 +9,20 @@ rho = 1.1845  # Fluid density in kg/m^3
 sampling_rate = 44000 # Hz
 
 class Waveform:
-	# sine wave only
-	def __init__(self, freq, phi=0, sampling_rate=44100, num_samples=200):
-		self.amp = 10	# Source wave amplitude
+	'''
+	Creates a sine waveform, typically representing the originally transmitted wave
+	Parameters:
+		freq (int): frequency of sine wave
+		amp (float): amplitude of wave.
+		phi (float): phase offset (rads)
+		num_samples (int): number of samples in waveform
+		sampling_rate (int): 
+	Returns:
+	Class instance with terms
+		wave (np.array(num_samples)): np.array of waveform
+ 	'''
+	def __init__(self, freq, amp=1.0, phi=0, sampling_rate=44100, num_samples=200):
+		self.amp = amp	# Source wave amplitude
 		self.freq = freq
 		self.phi = phi
 
@@ -85,67 +96,14 @@ class MicArray:
 	def __len__(self):
 		return self.num_mics
 
-	def generateWaveforms(self, src_pos, src_wave):
+	def simulate_waveforms(self, src_pos, src_wave):
 		self.waveforms = []
 
 		# TODO: should we have a check for src_wave.sampling_rate and num_samples?
 		# or should we not have those fields in MicArray at all?
 		for mic in self.mics:
-			self.waveforms.append(mic.generateWaveform(src_pos, src_wave))
+			self.waveforms.append(mic.simulate_waveform(src_pos, src_wave))
 		return self.waveforms		
-
-class generateWaveform:
-	'''
-	Creates a sine waveform
-	Parameters:
-		freq (int): frequency of sine wave
-		num_samples (int): number of samples in waveform
-		sampling_rate (int): 
-	Returns:
-	Class instance with terms
-		waveform (np.array): of length num_samples
-		amplitude
-		phi - phase difference
-		frequency
-	'''
-	def __init__(self,freq, num_samples, sampling_rate=44100):
-		
-		self.amp = 10 # Source wave amplitude
-		# wave is of the form A0*sin(2*pi*v*t)
-		# simple sin wave omnidirectional
-		self.phi = 0
-		t_range = np.linspace(0, num_samples/sampling_rate, num=num_samples)
-		self.freq = freq
-		self.wave = self.amp*np.sin(2*np.pi*self.freq * t_range + self.phi)
-
-
-def simWaveform(mic_pos, source_pos, source_wave):
-	'''
-	Simulates propagation of audio thru air. Namely, applies appropriate time delay
-	and attenuation to source_wave
-		Parameters:
-			mic_pos (np.array(2)): cartesian coords of mic (receiver)
-			source_pos (np.array(2)): coords of source
-			source_wave (class instance of generateWaveform): waveform that the source emits
-		Returns:
-			simulated_wave (np.array): output waveform from mic
-	'''
-	# sample_delay = int(sampling_rate * ph.distance(mic_pos, source_pos) / sound_speed)
-	# Ashutosh's code
-
-	# Distance between source and mic
-	d =np.array(mic_pos) - np.array(source_pos)
-	dist = np.sqrt(np.dot(d,d))
-
-	# Phase difference in recieved wave due to distance
-	source_wave.phi = (2*np.pi*source_wave.freq * dist) / sound_speed
-
-	# Attenuation calculated by Stoke's law of sound attenuation
-	# A = A0*e^(-alpha*d), alpha = 2*eta*v^2/3*rho*c^3
-	alpha = (2*eta*(source_wave.freq**2)) / (3*rho*(sound_speed**3))
-	source_wave.amp = source_wave.amp * np.exp(-alpha * dist)
-
-	return source_wave
 
 # def calcTimeDelay(og_wave, dly_wave, sampling_rate):
 # 	'''
@@ -182,7 +140,16 @@ def simWaveform(mic_pos, source_pos, source_wave):
 # main function for testing only
 # you can test your functions here
 if __name__ == '__main__':
-	MicArray array = MicArray(8, 1)
+	array = MicArray(8, 1)
 	src_pos = np.array((2, 2))
 	src_wave = Waveform(1000)
+
+	array.simulate_waveforms(src_pos, src_wave)
+	
+	import matplotlib.pyplot as plt
+
+	# TODO: show subplots
+	for waveform in array.waveforms:
+		plt.plot(waveform.wave)
+	plt.show()
 	
