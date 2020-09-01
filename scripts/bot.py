@@ -23,6 +23,7 @@ from random import random
 ###### 20/08/2020 : Aditya
 def bot_server_client(request_obj):
 	response_obj = bot_server_proxy(request_obj)
+	#####ADD RANDOM ALGO HERE
 	return response_obj
 ######
 
