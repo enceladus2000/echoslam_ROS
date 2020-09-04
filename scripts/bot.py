@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 
-from echoslam.msg import Bot
+from echoslam_ROS.msg import Bot #28/08/2020 : Aditya changed echoslam to echoslam_ROS in this line.
+from echoslam_ROS.srv import *
+from std_msgs.msg import Int32
 import sys
 import rospkg
 import rospy
@@ -17,6 +19,14 @@ from random import random
 """
 
 # import robot class from src folder
+
+###### 20/08/2020 : Aditya
+def bot_server_client(request_obj):
+	response_obj = bot_server_proxy(request_obj)
+	#####ADD RANDOM ALGO HERE
+	return response_obj
+######
+
 rospack = rospkg.RosPack()
 path = rospack.get_path('echoslam_ROS')
 sys.path.append(path)
@@ -49,9 +59,12 @@ def callback(msg):
 		pub.publish(robot.msg)
 
 
-robot = Robot()			# create Robot object
+robot = Robot()		
+rospy.wait_for_service('/bot_service')
+bot_server_proxy = rospy.ServiceProxy('/bot_service', BotService)
 sub = rospy.Subscriber(robot.topic_name, Bot, callback)
 pub = rospy.Publisher(robot.topic_name, Bot, queue_size=3)
+
 
 transmit_delay = 1.0	# time delay between transmissions, in seconds
 np.set_printoptions(precision=4)
@@ -67,7 +80,8 @@ def main():
 		print('Exiting...')
 		sys.exit(2)
 
-	robot.initRandomPos((0, 0), (5, 5))		# spawn bot in some random position
+	#robot.initRandomPos((0, 0), (5, 5))		# spawn bot in some random position
+	robot.setPose(bot_server_client(BotServiceRequest(Int32(robot.id))))
 	robot.setMicArray(6, .1)
 	robot.createMsg()							# must call before pub.publish(robot.msg)
 

@@ -1,4 +1,5 @@
-from echoslam.msg import Bot
+from echoslam_ROS.msg import Bot
+import rospy
 import random 
 import numpy as np
 from pointhelper import *
@@ -16,6 +17,7 @@ class Robot:
 		self.id = id
 		self.teamsize = teamsize
 		self.pos = np.array(pos, dtype=np.float32)
+		self.radius = rospy.get_param('/radius')
 
 	def getBotName(self):
 		return 'bot' + str(self.id)
@@ -24,6 +26,12 @@ class Robot:
 	def initRandomPos(self, corner1, corner2):
 		self.pos[0] = random.uniform(corner1[0], corner2[0])
 		self.pos[1] = random.uniform(corner1[1], corner2[1])
+
+	### 20/08/2020 : Aditya Bidwai
+	def setPose(self, response_obj):
+		self.pos[0] = response_obj.bot.x.data
+		self.pos[1] = response_obj.bot.y.data
+	###
 
 	# compile bot info into a message
 	# must call 

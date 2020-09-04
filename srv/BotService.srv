@@ -1,0 +1,3 @@
+std_msgs/Int32 id
+---
+echoslam_ROS/Bot bot
