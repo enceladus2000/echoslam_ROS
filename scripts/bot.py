@@ -37,11 +37,7 @@ def main():
 	robot.init_random_pos((0, 0), (5, 5))		# spawn bot in some random position
 	robot.init_mic_array(num_mics=6, radius=0.1)
 	robot.init_msg()							# must call before pub.publish(robot.msg)
-
-	# node name is determined by the launch file
-	# but init_node still needs to be called			
-	rospy.init_node(robot.get_bot_name())	
-	print('Starting {}...'.format(robot.get_bot_name()))
+	robot.init_comms()							# initialise node and pub/sub
 
 	# bot1 will be initialised last, and it will start the msg chain
 	if robot.id == 1:

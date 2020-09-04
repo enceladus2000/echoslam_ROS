@@ -20,13 +20,12 @@ class Robot:
 		self.bot_radius = radius		# radius of the circular bot
 		self.pos = np.array(pos, dtype=np.float32)	# abs position of bot
 		self.ori = ori					# angle of bot with x axis
-
-		self.init_comms()
 	
 	def init_comms(self):
 		self.sub = rospy.Subscriber(self.topic_name, Bot, self.callback_RF)
 		self.pub = rospy.Publisher(self.topic_name, Bot, queue_size=3)
 		self.transmit_delay = 1.0		# time delay between transmissions, (seconds)
+		rospy.init_node(self.get_bot_name())
 
 	def init_mic_array(self, num_mics, radius=None, sampling_rate=44100, num_samples=200):
 		if radius is None:
