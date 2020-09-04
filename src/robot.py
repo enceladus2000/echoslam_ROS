@@ -12,11 +12,12 @@ class Robot:
 	transmitter_pos = [0,0]	# position of transmitter wrt center of bot
 	transmitted_wave = None
 	
-	def __init__(self, id=0, teamsize=1, radius=1, pos=(0,0)):
+	def __init__(self, id=0, teamsize=1, radius=1, pos=(0,0), ori=0):
 		self.id = id
 		self.teamsize = teamsize		# number of bots in a team
 		self.bot_radius = radius		# radius of the circular bot
 		self.pos = np.array(pos, dtype=np.float32)	# abs position of bot
+		self.ori = ori					# angle of bot with x axis
 
 	def init_mic_array(self, num_mics, radius=None, sampling_rate=44100, num_samples=200):
 		if radius is None:

@@ -1,5 +1,11 @@
 #! /usr/bin/env python
 
+"""TODO:
+1. robot.calcTOFs()
+2. robot.trilaterate(tofs) instead of dofs
+3. implement pub, sub and callback within Robot class
+"""
+
 from echoslam.msg import Bot
 import sys
 import rospkg
@@ -7,12 +13,6 @@ import rospy
 import getopt
 import numpy as np 
 from random import random
-
-"""TODO:
-1. robot.calcTOFs()
-2. robot.trilaterate(tofs) instead of dofs
-3. implement pub, sub and callback within Robot class
-"""
 
 # import robot class from src folder
 rospack = rospkg.RosPack()
