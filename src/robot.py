@@ -1,4 +1,6 @@
 from echoslam.msg import Bot
+import rospkg
+import rospy
 import random 
 import numpy as np
 from pointhelper import *
@@ -19,6 +21,13 @@ class Robot:
 		self.pos = np.array(pos, dtype=np.float32)	# abs position of bot
 		self.ori = ori					# angle of bot with x axis
 
+		self.init_comms()
+	
+	def init_comms(self):
+		self.sub = rospy.Subscriber(self.topic_name, Bot, self.callback_RF)
+		self.pub = rospy.Publisher(self.topic_name, Bot, queue_size=3)
+		self.transmit_delay = 1.0		# time delay between transmissions, (seconds)
+
 	def init_mic_array(self, num_mics, radius=None, sampling_rate=44100, num_samples=200):
 		if radius is None:
 			marray_radius = self.bot_radius
@@ -27,9 +36,6 @@ class Robot:
 		
 		self.mic_array = ac.MicArray(num_mics, marray_radius,
 								sampling_rate, num_samples, self.pos)
-
-	def get_bot_name(self):
-		return 'bot' + str(self.id)
 
 	# args are corners of rectangle in cartesian
 	def init_random_pos(self, corner1, corner2):
@@ -43,6 +49,28 @@ class Robot:
 		self.msg.id.data = self.id
 		self.msg.x.data = self.pos[0]
 		self.msg.y.data = self.pos[1]
+
+	def callback_RF(self, msg):
+		# ignore messages sent by itself
+		if msg.id.data != self.id:
+			print(self.get_bot_name()+" callback:")
+
+			source_pos = np.array((msg.x.data, msg.y.data))
+			self.record_waveforms(source_pos)
+			# tofs = robot.calc_TOFs()
+			# est_src_pos = robot.trilaterate(tofs)
+			print("Actual rel_src_pos = ", source_pos-self.pos)
+
+		# check if bot that just transmitted is the one before
+		if msg.id.data % self.teamsize == self.id - 1:
+			rospy.sleep(self.transmit_delay)
+			self.transmit()
+
+	def get_bot_name(self):
+		return 'bot' + str(self.id)
+
+	def transmit(self):
+		self.pub.publish(self.msg)
 
 	def create_transmitted_wave(self, w_freq):
 		self.transmitted_wave = ac.Waveform(
