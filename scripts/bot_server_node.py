@@ -8,11 +8,11 @@ import rospkg
 import rospy
 from echoslam_ROS.srv import BotService, BotServiceResponse
 
-from src.robot import Robot
 
 rospack = rospkg.RosPack()
 path = rospack.get_path("echoslam_ROS")
 sys.path.append(path)
+from src.robot import Robot
 
 bots = rospy.get_param("/size")
 radius = rospy.get_param("/radius")
