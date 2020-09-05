@@ -27,8 +27,8 @@ class Waveform:
 		self.phi = phi
 
 		# wave is of the form A0*sin(2*pi*v*t)
-		self.t_range = np.linspace(0, num_samples/sampling_rate, num=num_samples)
-		self.wave = self.amp*np.sin(2*np.pi*self.freq * self.t_range + self.phi)
+		t_range = np.linspace(0, num_samples/sampling_rate, num=num_samples)
+		self.wave = self.amp*np.sin(2*np.pi*self.freq * t_range + self.phi)
 
 	# TODO: construcotr/classmethod for arbitrary signals?
 
@@ -61,19 +61,26 @@ class Mic:
 	def __repr__(self):
 		return 'Mic: pos = {p}'.format(p=self.pos)
 
-	def simulate_waveform(self, src_pos, src_wave, samping_rate=44100):
+	def simulate_waveform(self, src_pos, src_wave, samping_rate=44100, num_samples=200):
 		# Distance between source and mic
 		dist = ph.distance(self.pos, src_pos)
 
 		# TODO @Ashutosh: Add proper delay, not phase delay.
-		# Phase difference in recieved wave due to distance
-		self.phi = (sampling_rate * dist) / sound_speed
+		# Phase difference in recieved wave due to distance		
+		max_dist = 10 #max distance taken  10m
+		max_num = int(num_samples + (samping_rate*max_dist)/sound_speed)
+		t_range = np.linspace(0,0, num=max_num)
+
+		wave_num = int(num_samples + (samping_rate * dist)/sound_speed)
+		t_wave = np.linspace(0, wave_num/samping_rate, num=wave_num)
+
+		t_range[0:wave_num] = t_range[0:wave_num] + t_wave
 
 		# Attenuation calculated by Stoke's law of sound attenuation
 		# A = A0*e^(-alpha*d), alpha = 2*eta*v^2/3*rho*c^3
 		alpha = (2*eta*(src_wave.freq**2)) / (3*rho*(sound_speed**3))
 		self.amp = src_wave.amp * np.exp(-alpha * dist)
-		self.wave = self.amp*np.sin(2*np.pi * src_wave.freq * src_wave.t_range + self.phi)
+		self.wave = self.amp*np.sin(2*np.pi * src_wave.freq * t_range + src_wave.phi)
 
 		return self.wave
 
