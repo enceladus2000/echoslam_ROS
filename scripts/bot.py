@@ -20,18 +20,18 @@ from random import random
 
 # import robot class from src folder
 
+rospack = rospkg.RosPack()
+path = rospack.get_path('echoslam_ROS')
+sys.path.append(path)
+from src.robot import Robot
+from src.acoustics import simReceivedWaveform, calcTOFs
+
 ###### 20/08/2020 : Aditya
 def bot_server_client(request_obj):
 	response_obj = bot_server_proxy(request_obj)
 	#####ADD RANDOM ALGO HERE
 	return response_obj
 ######
-
-rospack = rospkg.RosPack()
-path = rospack.get_path('echoslam_ROS')
-sys.path.append(path)
-from src.robot import Robot
-from src.acoustics import simReceivedWaveform, calcTOFs
 
 # gets called once bot receives message on topic
 def callback(msg):
