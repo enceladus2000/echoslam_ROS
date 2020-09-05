@@ -47,10 +47,17 @@ def bot_server(request_obj):
     response_obj.bot.x.data = pose_generator()[0]
     response_obj.bot.y.data = pose_generator()[1]
     response_obj.bot.id.data = request_obj.id.data
+
+    print("Server generated reponse:")
+    print_response(response_obj)
     ###ADD RANDOM NUMBER ALGO HERE
     return response_obj
 
-
+def print_response(response_obj):
+    print("\t id: {}".format(response_obj.bot.id.data))
+    print("\t x: {}".format(response_obj.bot.x.data))
+    print("\t y: {}".format(response_obj.bot.y.data))
+    
 rospy.init_node("bot_server_node")
 bot_service = rospy.Service("/bot_service", BotService, bot_server)
 print("#######################")

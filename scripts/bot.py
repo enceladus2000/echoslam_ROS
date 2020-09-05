@@ -1,5 +1,13 @@
 #! /usr/bin/env python
 
+"""TODO:
+	1. understand tis bot server thing lmao
+	2. comments for robot class
+	3. robot.ori + trilateration implementation
+	4. 
+"""
+
+
 from echoslam_ROS.msg import Bot #28/08/2020 : Aditya changed echoslam to echoslam_ROS in this line.
 from echoslam_ROS.srv import *
 from std_msgs.msg import Int32
@@ -39,14 +47,14 @@ def main():
 		sys.exit(2)
 
 	robot.set_pose(bot_server_client(BotServiceRequest(Int32(robot.id)))) # ??
-	# robot.init_random_pos((0, 0), (5, 5))		# spawn bot in some random position
 	robot.init_mic_array(num_mics=6, radius=0.1)
 	robot.init_msg()							# must call before pub.publish(robot.msg)
 	robot.init_comms()							# initialise node and pub/sub
-	robot.print_details()		
+	robot.print_details()	
+
 	# bot1 will be initialised last, and it will start the msg chain
 	if robot.id == 1:
-		rospy.sleep(0.5)
+		rospy.sleep(1.0)
 		print('Bot1 initialising conversation...')
 		robot.transmit()
 
