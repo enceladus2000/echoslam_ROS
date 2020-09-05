@@ -61,20 +61,28 @@ class Mic:
 	def __repr__(self):
 		return 'Mic: pos = {p}'.format(p=self.pos)
 
-	def simulate_waveform(self, src_pos, src_wave):
+	def simulate_waveform(self, src_pos, src_wave, samping_rate=44100, num_samples=200):
 		# Distance between source and mic
 		dist = ph.distance(self.pos, src_pos)
 
 		# TODO @Ashutosh: Add proper delay, not phase delay.
-		# Phase difference in recieved wave due to distance
-		# source_wave.phi = (2*np.pi*source_wave.freq * dist) / sound_speed
+		# Phase difference in recieved wave due to distance		
+		max_dist = 10 #max distance taken  10m
+		max_num = int(num_samples + (samping_rate*max_dist)/sound_speed)
+		t_range = np.linspace(0,0, num=max_num)
+
+		wave_num = int(num_samples + (samping_rate * dist)/sound_speed)
+		t_wave = np.linspace(0, wave_num/samping_rate, num=wave_num)
+
+		t_range[0:wave_num] = t_range[0:wave_num] + t_wave
 
 		# Attenuation calculated by Stoke's law of sound attenuation
 		# A = A0*e^(-alpha*d), alpha = 2*eta*v^2/3*rho*c^3
 		alpha = (2*eta*(src_wave.freq**2)) / (3*rho*(sound_speed**3))
-		src_wave.amp = src_wave.amp * np.exp(-alpha * dist)
+		self.amp = src_wave.amp * np.exp(-alpha * dist)
+		self.wave = self.amp*np.sin(2*np.pi * src_wave.freq * t_range + src_wave.phi)
 
-		return src_wave
+		return self.wave
 
 # class containing array of Mic[]
 class MicArray:
