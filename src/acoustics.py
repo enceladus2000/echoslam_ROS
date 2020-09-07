@@ -3,34 +3,45 @@ import pointhelper as ph
 # from scipy import signal
 
 # All properties of air at 25C and atm pressure
-sound_speed = 343  # m/s
-eta = 1.844E-5  # Dynamic viscosity in kg/m.s
-rho = 1.1845  # Fluid density in kg/m^3
-sampling_rate = 44000 # Hz
+sound_speed = 343  			# m/s
+eta = 1.844E-5  			# Dynamic viscosity in kg/m.s
+rho = 1.1845  				# Fluid density in kg/m^3
+sampling_rate = 44000 		# Hz
 
 class Waveform:
-	'''
-	Creates a sine waveform, typically representing the originally transmitted wave
-	Parameters:
-		freq (int): frequency of sine wave
-		amp (float): amplitude of wave.
-		phi (float): phase offset (rads)
-		num_samples (int): number of samples in waveform
-		sampling_rate (int): 
-	Returns:
-	Class instance with terms
-		wave (np.array(num_samples)): np.array of waveform
- 	'''
 	def __init__(self, freq, amp=1.0, phi=0, sampling_rate=44100, num_samples=200):
+		'''
+		Creates a sine waveform, typically representing the originally transmitted wave
+			Parameters:
+				freq (int): frequency of sine wave
+				amp (float): amplitude of wave.
+				phi (float): phase offset (rads)
+				num_samples (int): number of samples in waveform
+				sampling_rate (int): 
+			Returns:
+			Class instance with terms
+				wave (np.array(num_samples)): np.array of waveform
+		'''
 		self.amp = amp	# Source wave amplitude
 		self.freq = freq
 		self.phi = phi
+		self.sampling_rate = sampling_rate
+		self.num_samples = num_samples
 
 		# wave is of the form A0*sin(2*pi*v*t)
 		t_range = np.linspace(0, num_samples/sampling_rate, num=num_samples)
 		self.wave = self.amp*np.sin(2*np.pi*self.freq * t_range + self.phi)
 
-	# TODO: construcotr/classmethod for arbitrary signals?
+	# DONE: construcotr/classmethod for arbitrary signals?
+	@classmethod
+	def from_array(cls, array, sampling_rate):
+		# check array dimensions
+		cls.wave = array
+		cls.sampling_rate = sampling_rate
+		cls.num_samples = len(array)
+		cls.freq = None 		# add fft here?
+
+		return cls
 
 	def calcTimeDelay(self, og_wave, dly_wave, sampling_rate):
 		'''
@@ -61,28 +72,41 @@ class Mic:
 	def __repr__(self):
 		return 'Mic: pos = {p}'.format(p=self.pos)
 
-	def simulate_waveform(self, src_pos, src_wave, samping_rate=44100, num_samples=200):
-		# Distance between source and mic
-		dist = ph.distance(self.pos, src_pos)
+	def simulate_waveform(self, src_pos, src_wave):
+		"""
+		Simulates the output of a mic
+			Parameters:
+				src_pos (np.array(2)): absolute coordinates of source
+				src_wave (Waveform): waveform that the source emits
+			Returns:
+				sim_wave (Waveform): delayed, attenuated src_wave
+		"""
 
-		# TODO @Ashutosh: Add proper delay, not phase delay.
-		# Phase difference in recieved wave due to distance		
-		max_dist = 10 #max distance taken  10m
-		max_num = int(num_samples + (samping_rate*max_dist)/sound_speed)
-		t_range = np.linspace(0,0, num=max_num)
+		dist = ph.distance(self.pos, src_pos)		# Distance between source and mic
+		MAX_DIST = 10 								# max possible distance of src (m)
+		wave_sr = src_wave.sampling_rate			# aliases for src_wave
+		wave_ns = src_wave.num_samples
+		
+		sim_ns = int(wave_ns + wave_sr*MAX_DIST/sound_speed)	# number of samples in simulated wave
+		sim_wave_arr = np.zeros(sim_ns)
 
-		wave_num = int(num_samples + (samping_rate * dist)/sound_speed)
-		t_wave = np.linspace(0, wave_num/samping_rate, num=wave_num)
-
-		t_range[0:wave_num] = t_range[0:wave_num] + t_wave
-
-		# Attenuation calculated by Stoke's law of sound attenuation
+		# Attenuate src_wave, alculated by Stoke's law of sound attenuation
 		# A = A0*e^(-alpha*d), alpha = 2*eta*v^2/3*rho*c^3
 		alpha = (2*eta*(src_wave.freq**2)) / (3*rho*(sound_speed**3))
-		self.amp = src_wave.amp * np.exp(-alpha * dist)
-		self.wave = self.amp*np.sin(2*np.pi * src_wave.freq * t_range + src_wave.phi)
+		atten_wave = np.exp(-alpha * dist) * src_wave.wave
 
-		return self.wave
+		dly_ns = int(wave_sr*dist/sound_speed)			# time delay in number of samples
+		sim_wave_arr[ dly_ns+1 : dly_ns+1+wave_ns ] = atten_wave
+		
+		# import matplotlib.pyplot as plt
+		# plt.plot(sim_wave_arr)
+		# plt.grid(True)
+		# plt.show()
+
+		# TODO: find better, less jugaadi way to do this!
+		sim_wave = Waveform(freq=src_wave.freq, sampling_rate=wave_sr, num_samples=sim_ns)
+		sim_wave.wave = sim_wave_arr
+		return sim_wave
 
 # class containing array of Mic[]
 class MicArray:
@@ -148,8 +172,8 @@ class MicArray:
 # main function for testing only
 # you can test your functions here
 if __name__ == '__main__':
-	array = MicArray(8, 1)
-	src_pos = np.array((2, 2))
+	array = MicArray(4, 1)
+	src_pos = np.array((4, 3))
 	src_wave = Waveform(1000)
 
 	array.simulate_waveforms(src_pos, src_wave)
@@ -159,5 +183,6 @@ if __name__ == '__main__':
 	# TODO: show subplots
 	for waveform in array.waveforms:
 		plt.plot(waveform.wave)
+		print(id(waveform))
 	plt.show()
 	
