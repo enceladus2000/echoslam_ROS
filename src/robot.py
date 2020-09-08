@@ -110,6 +110,7 @@ class Robot:
 	# 	return micDOFs
 
 	# returns 2D vector of relative position of other robot wrt this robot
+	# static method?
 	def trilaterate(self, micDOFs):
 		est_rel_pos = geo_trilaterate(micDOFs)
 		return est_rel_pos

@@ -9,39 +9,29 @@ rho = 1.1845  				# Fluid density in kg/m^3
 sampling_rate = 44000 		# Hz
 
 class Waveform:
-	def __init__(self, freq, amp=1.0, phi=0, sampling_rate=44100, num_samples=200):
+	def __init__(self, wave_arr, sampling_rate=44100, freq=None):
 		'''
-		Creates a sine waveform, typically representing the originally transmitted wave
 			Parameters:
-				freq (int): frequency of sine wave
-				amp (float): amplitude of wave.
-				phi (float): phase offset (rads)
-				num_samples (int): number of samples in waveform
-				sampling_rate (int): 
+				wave_array (1D np.array): waveform 
+				sampling_rate (int): samples per second
+				freq (int): 
 			Returns:
 			Class instance with terms
 				wave (np.array(num_samples)): np.array of waveform
 		'''
-		self.amp = amp	# Source wave amplitude
-		self.freq = freq
-		self.phi = phi
 		self.sampling_rate = sampling_rate
-		self.num_samples = num_samples
+		self.num_samples = len(wave_arr)
+		self.freq = freq
+		# check for array dimensions
+		self.wave = wave_arr
 
-		# wave is of the form A0*sin(2*pi*v*t)
-		t_range = np.linspace(0, num_samples/sampling_rate, num=num_samples)
-		self.wave = self.amp*np.sin(2*np.pi*self.freq * t_range + self.phi)
-
-	# DONE: construcotr/classmethod for arbitrary signals?
 	@classmethod
-	def from_array(cls, array, sampling_rate):
-		# check array dimensions
-		cls.wave = array
-		cls.sampling_rate = sampling_rate
-		cls.num_samples = len(array)
-		cls.freq = None 		# add fft here?
+	def sine(cls, amp, freq, phi=0, sampling_rate=44100, num_samples=200):
+		'''inits a Waveform obj with a sine wave'''
+		t = np.linspace(0, num_samples/sampling_rate, num_samples)
+		wave = amp * np.sin(2*np.pi*freq * t + phi)
+		return cls(wave, sampling_rate, freq)
 
-		return cls
 
 	def calcTimeDelay(self, og_wave, dly_wave, sampling_rate):
 		'''
@@ -103,8 +93,7 @@ class Mic:
 		# plt.grid(True)
 		# plt.show()
 
-		# TODO: find better, less jugaadi way to do this!
-		sim_wave = Waveform(freq=src_wave.freq, sampling_rate=wave_sr, num_samples=sim_ns)
+		sim_wave = Waveform(sim_wave_arr, wave_sr)
 		sim_wave.wave = sim_wave_arr
 		return sim_wave
 
@@ -156,25 +145,25 @@ class MicArray:
 			self.waveforms.append(mic.simulate_waveform(src_pos, src_wave))
 		return self.waveforms		
 
-# def calcTOFs(og_wave, rec_waveforms):
-# 	'''
-# 	Performs calcTimeDelay() on each waveform in rec_waveforms
-# 		Parameters:
-# 			og_wave (np.array): original wave, as reference
-# 			rec_waveforms (list of np.arrays): list of waveforms
-# 			sampling_rate (int): 
-# 		Returns:
-# 			TOFs (list of float): in seconds
-# 	'''
-# 	# loop calcTimeDelay(transmitted_wave, recwaveform[i])
-# 	pass
+def calcTOFs(og_wave, rec_waveforms):
+	'''
+	Performs calcTimeDelay() on each waveform in rec_waveforms
+		Parameters:
+			og_wave (np.array): original wave, as reference
+			rec_waveforms (list of np.arrays): list of waveforms
+			sampling_rate (int): 
+		Returns:
+			TOFs (list of float): in seconds
+	'''
+	# loop calcTimeDelay(transmitted_wave, recwaveform[i])
+	pass
 
 # main function for testing only
 # you can test your functions here
 if __name__ == '__main__':
 	array = MicArray(4, 1)
 	src_pos = np.array((4, 3))
-	src_wave = Waveform(1000)
+	src_wave = Waveform.sine(1.0, 1000)
 
 	array.simulate_waveforms(src_pos, src_wave)
 	
