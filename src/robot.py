@@ -82,7 +82,8 @@ class Robot:
 		self.pub.publish(self.msg)
 
 	def create_transmitted_wave(self, w_freq):
-		self.transmitted_wave = ac.Waveform(
+		self.transmitted_wave = ac.Waveform.sine(
+				amp=1.0,
 				freq=w_freq,
 				sampling_rate=self.mic_array.sampling_rate,
 				num_samples=self.mic_array.num_samples
