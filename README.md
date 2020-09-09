@@ -1,6 +1,6 @@
 # ROS simulations for EchoSLAM
 
-We'll be testing our algorithms in a ROS environment. 
+We'll be testing our localisation algorithms in a ROS environment. 
 
 To launch a sample simulation of n bots
 * Clone this package into your workspace
