@@ -23,10 +23,10 @@ class Robot:
 		self.pos = np.array(pos, dtype=np.float32)	# abs position of bot
 		self.ori = ori					# angle of bot with x axis
 	
-	def init_comms(self):
+	def init_comms(self, transmit_delay=1.0):
 		self.sub = rospy.Subscriber(self.topic_name, Bot, self.callback_RF)
 		self.pub = rospy.Publisher(self.topic_name, Bot, queue_size=3)
-		self.transmit_delay = 1.0		# time delay between transmissions, (seconds)
+		self.transmit_delay = transmit_delay		# time delay between transmissions, (seconds)
 		rospy.init_node(self.get_bot_name())
 		print('Starting {}...'.format(self.get_bot_name()))
 
@@ -62,23 +62,24 @@ class Robot:
 	def callback_RF(self, msg):
 		# ignore messages sent by itself
 		if msg.id.data != self.id:
-			print(self.get_bot_name()+" callback:")
+			print(self.get_bot_name()+" callback: Received "+str(msg.id.data))
 
 			source_pos = np.array((msg.x.data, msg.y.data))
 			self.record_waveforms(source_pos)
 			# tofs = robot.calc_TOFs()
 			# est_src_pos = robot.trilaterate(tofs)
-			print("Actual rel_src_pos = ", source_pos-self.pos)
+			# print("/Actual rel_src_pos = ", source_pos-self.pos)
 
 		# check if bot that just transmitted is the one before
 		if msg.id.data % self.teamsize == self.id - 1:
-			rospy.sleep(self.transmit_delay)
-			self.transmit()
+			rospy.Timer(rospy.Duration(self.transmit_delay), self.transmit, oneshot=True)
+			# rospy.sleep(self.transmit_delay)
+			# self.transmit()
 
 	def get_bot_name(self):
 		return 'bot' + str(self.id)
 
-	def transmit(self):
+	def transmit(self, event=None):
 		self.pub.publish(self.msg)
 
 	def create_transmitted_wave(self, w_freq):

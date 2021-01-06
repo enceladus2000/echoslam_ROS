@@ -4,7 +4,8 @@
 	1. understand tis bot server thing lmao
 	2. comments for robot class
 	3. robot.ori + trilateration implementation
-	4. 
+	4. represenet bot on pyplot
+	5. demarcate hardware modules as separate classes
 """
 
 
